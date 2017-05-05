@@ -27,18 +27,7 @@ Package.create('/path/to/package')
 ```
 
 ## API
-
-Until I properly write API/Doc you can see interface definitions in [source](src/index.ts) file.
-
-### Methods
-| Method                                                                                                                             | Return            | Description                                                      |
-|------------------------------------------------------------------------------------------------------------------------------------|-------------------|------------------------------------------------------------------|
-| `Package(path: string)`                                                                                                            | Package           | Constructor for Package.                                         |
-| `Package.init(config: PackageConfig = {}, opts: InitOptions = { installDependencies: false, fillEmpty: false, overwrite: false })` | Promise\<Package> | Initializes package.json.                                        |
-| `Package.install(pkgs: (string|string[]), save = false, dev = false)`                                                              | Promise\<Package> | Installs new package(s). Updates package.json if `save` is true. |
-| `Package.uninstall(pkgs: (string|string[]), save = false, dev = false)`                                                            | Promise\<Package> | Uninstalls package(s). Updates package.json if `save` is true.   |
-| `static Package.create(dir: string)`                                                                                               | Promise\<Package> | Creates writable directory for the new package.                  |
-|                                                                                                                                    |                   |                                                                  |
+Until I properly write API/Doc, you can see definitions in [source](src/index.ts) file.
 
 ## Verbose
 This package uses [debug](https://github.com/visionmedia/debug) module. So you can set environment variable to display verbose log messages.
