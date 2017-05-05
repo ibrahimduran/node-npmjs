@@ -13,18 +13,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/ibrahimduran/node-npmjs.git"
+    "url": "git+ssh://git@github.com/ibrahimduran/node-puckages.git"
   },
   "keywords": [
     "npm",
     "programmatically"
   ],
-  "author": "İbrahim Duran",
+  "author": "İbrahim Duran <ibrahimeymenduran@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ibrahimduran/node-npmjs/issues"
+    "url": "https://github.com/ibrahimduran/node-puckages/issues"
   },
-  "homepage": "https://github.com/ibrahimduran/node-npmjs#readme",
+  "homepage": "https://github.com/ibrahimduran/node-puckages#readme",
   "devDependencies": {
     "@types/chai": "^3.5.2",
     "@types/mocha": "^2.2.41",
