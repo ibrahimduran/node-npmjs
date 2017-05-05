@@ -1,5 +1,5 @@
 # node-puckages
-[![npm](https://img.shields.io/npm/v/puckages.svg)](https://www.puckages.com/package/puckages) [![Travis](https://img.shields.io/travis/ibrahimduran/node-puckages.svg)](https://travis-ci.org/ibrahimduran/node-puckages) [![Coverage Status](https://coveralls.io/repos/github/ibrahimduran/node-puckages/badge.svg?branch=master)](https://coveralls.io/github/ibrahimduran/node-puckages?branch=master)
+[![npm version](https://badge.fury.io/js/puckages.svg)](https://badge.fury.io/js/puckages) [![Travis](https://img.shields.io/travis/ibrahimduran/node-puckages.svg)](https://travis-ci.org/ibrahimduran/node-puckages) [![Coverage Status](https://coveralls.io/repos/github/ibrahimduran/node-puckages/badge.svg?branch=master)](https://coveralls.io/github/ibrahimduran/node-puckages?branch=master)
 
 node package manager for node.js
 
