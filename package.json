@@ -1,0 +1,45 @@
+{
+  "name": "puckages",
+  "version": "0.0.1",
+  "description": "node package manager for node.js",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev-env": "tsc --watch",
+    "test": "mocha --compilers ts:ts-node/register",
+    "coverage": "istanbul cover -x test/**/* node_modules/mocha/bin/_mocha -- --compilers ts:ts-node/register -R spec test/**/*",
+    "remap-coverage": "remap-istanbul -i coverage/coverage.json -o coverage/remapped -t html -b build",
+    "coveralls": "istanbul cover -x test/**/* node_modules/mocha/bin/_mocha --report lcovonly -- --compilers ts:ts-node/register -R spec test/**/* && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ibrahimduran/node-npmjs.git"
+  },
+  "keywords": [
+    "npm",
+    "programmatically"
+  ],
+  "author": "İbrahim Duran",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ibrahimduran/node-npmjs/issues"
+  },
+  "homepage": "https://github.com/ibrahimduran/node-npmjs#readme",
+  "devDependencies": {
+    "@types/chai": "^3.5.2",
+    "@types/mocha": "^2.2.41",
+    "chai": "^3.5.0",
+    "coveralls": "^2.13.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.3.0",
+    "remap-istanbul": "^0.9.5",
+    "ts-node": "^3.0.2",
+    "typescript": "^2.3.2"
+  },
+  "dependencies": {
+    "@types/fs-extra": "^3.0.0",
+    "@types/node": "^7.0.14",
+    "debug": "^2.6.6",
+    "fs-extra": "^3.0.0"
+  }
+}
