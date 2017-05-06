@@ -8,10 +8,26 @@
   "scripts": {
     "build": "tsc",
     "dev-env": "tsc --watch",
-    "test": "mocha --compilers ts:ts-node/register",
-    "coverage": "istanbul cover -x test/**/* node_modules/mocha/bin/_mocha -- --compilers ts:ts-node/register -R spec test/**/*",
-    "remap-coverage": "remap-istanbul -i coverage/coverage.json -o coverage/remapped -t html -b build",
-    "coveralls": "istanbul cover -x test/**/* node_modules/mocha/bin/_mocha --report lcovonly -- --compilers ts:ts-node/register -R spec test/**/* && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+    "test": "mocha",
+    "coverage": "nyc mocha",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+  },
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "test/**/*"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "lcov"
+    ]
   },
   "repository": {
     "type": "git",
@@ -34,7 +50,8 @@
     "coveralls": "^2.13.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
-    "remap-istanbul": "^0.9.5",
+    "nyc": "^10.3.2",
+    "source-map-support": "^0.4.15",
     "ts-node": "^3.0.2",
     "typescript": "^2.3.2"
   },
