@@ -1,5 +1,27 @@
+# Log Files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Compilation
+build
+
+# Dependencies
 node_modules/
-build/
-coverage/
-test/.test/
+
+# NPM & Yarn related
+.npm
 .npmignore
+*.tgz
+.yarn-integrity
+
+# Tests
+coverage/
+.nyc_output/
+test/.test/
