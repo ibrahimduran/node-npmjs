@@ -1,8 +1,10 @@
 {
   "name": "puckages",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "node package manager for node.js",
   "main": "build/index.js",
+  "types": "./build/index.d.ts",
+  "typescript.tsdk": "./build",
   "scripts": {
     "build": "tsc",
     "dev-env": "tsc --watch",
