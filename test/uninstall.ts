@@ -38,7 +38,7 @@ describe('uninstall', function () {
 	});
 
 	it('should throw error while uninstalling packages', (done) => {
-		pkg.uninstall('--', false, false)
+		pkg.uninstall('--')
 			.then(() => done('Didn\'t throw any errors.'))
 			.catch(() => done());
 	});

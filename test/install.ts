@@ -30,7 +30,7 @@ describe('install', function () {
 		this.timeout(20000);
 
 		pkg.install('node-bar', true, true)
-			.then((p) => p.install('node-foo', false, false))
+			.then((p) => p.install('node-foo'))
 			.then((p) => fs.readJson(pkgDir + '/package.json'))
 			.then((json: any) => {
 				assert.equal(Boolean(json.devDependencies['node-foo']), false);
