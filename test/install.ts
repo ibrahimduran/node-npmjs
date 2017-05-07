@@ -40,6 +40,20 @@ describe('install', function () {
 			.catch(err => done(err));
 	});
 
+	it('should install new package but throw error while forceReloadingJson', function (done) {
+		this.timeout(20000);
+
+		(pkg as any).forceReloadJson = function () {
+			return new Promise<any>((resolve, reject) => {
+				reject('some_fs_error');
+			});
+		};
+
+		pkg.install('node-bar', true)
+			.then(() => done('it did not throw error'))
+			.catch((err) => err === 'some_fs_error' ? done() : done(err));
+	});
+
 	it('should try to install not existing package', function (done) {
 		this.timeout(5000);
 

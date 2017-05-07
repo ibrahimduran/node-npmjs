@@ -27,6 +27,11 @@ export interface InitOptions {
 export class Package {
 	private static debug = require('debug')('puckages');
 	private _path: string;
+	private _json: any = null;
+
+	get json() {
+		return this._json;
+	}
 
 	get path() {
 		return this._path;
@@ -97,6 +102,8 @@ export class Package {
 					.then(() => {
 						Package.debug('Successfully saved ' + path.join(this._path, 'package.json'));
 
+						this._json = packageJson;
+
 						if (opts.installDependencies) {
 							Package.debug('Installation of initialized dependencies is enabled');
 
@@ -115,6 +122,24 @@ export class Package {
 		});
 	}
 
+	public forceReloadJson(opts = { returnEmptyOnErr: false }) {
+		return new Promise<Package>((resolve, reject) => {
+			fs.readJson(path.join(this._path, 'package.json'))
+				.then(json => {
+					this._json = json;
+					resolve(this);
+				})
+				.catch(err => {
+					if (opts.returnEmptyOnErr) {
+						this._json = {};
+						resolve(this);
+					} else {
+						reject(err);
+					}
+				});
+		});
+	}
+
 	public install(pkgs?: (string[] | string), save = false, dev = false) {
 		Package.debug('Installing dependencies for ' + this._path);
 
@@ -126,7 +151,13 @@ export class Package {
 			exec(cmd, { cwd: this._path }, (err) => {
 				if (!err) {
 					Package.debug('Installation successful for ' + this._path);
-					resolve(this);
+					if (save) {
+						this.forceReloadJson()
+							.then(() => resolve(this))
+							.catch((err) => reject(err));
+					} else {
+						resolve(this);
+					}
 				} else {
 					Package.debug('Installation failed for ' + this._path);
 					reject(err);
@@ -144,7 +175,13 @@ export class Package {
 			exec(cmd, { cwd: this._path }, (err) => {
 				if (!err) {
 					Package.debug('Uninstall successful for ' + this._path);
-					resolve(this);
+					if (save) {
+						this.forceReloadJson()
+							.then(() => resolve(this))
+							.catch((err) => reject(err));
+					} else {
+						resolve(this);
+					}
 				} else {
 					Package.debug('Uninstall failed for ' + this._path);
 					reject(err);

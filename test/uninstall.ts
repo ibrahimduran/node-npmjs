@@ -37,6 +37,33 @@ describe('uninstall', function () {
 			.catch(err => done(err));
 	});
 
+	it('should uninstall packages without saving', (done) => {
+		pkg.uninstall(['node-foo'])
+			.then(() => fs.readJson(pkgDir + '/package.json'))
+			.then((json: any) => {
+				assert.equal(Boolean(json.devDependencies['node-foo']), true);
+
+				fs.pathExists(pkgDir + '/node_modules/node-foo')
+					.then((exists) => exists ? done('node_modules/node-foo still exists') : done())
+					.catch((err) => done(err));
+			})
+			.catch(err => done(err));
+	});
+
+	it('should uninstall packages but throw error while executing forceReloadJson', function (done) {
+		this.timeout(20000);
+
+		(pkg as any).forceReloadJson = function () {
+			return new Promise<any>((resolve, reject) => {
+				reject('some_fs_error');
+			});
+		};
+
+		pkg.uninstall('node-foo', true)
+			.then(() => done('it did not throw error'))
+			.catch((err) => err === 'some_fs_error' ? done() : done(err));
+	});
+
 	it('should throw error while uninstalling packages', (done) => {
 		pkg.uninstall('--')
 			.then(() => done('Didn\'t throw any errors.'))

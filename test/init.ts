@@ -27,6 +27,7 @@ describe('init', () => {
 			.then((p) => {
 				assert.equal(p instanceof Package, true);
 				assert.equal(p.path, pkgDir);
+				assert.equal(p.json, null);
 
 				pkg = p;
 
