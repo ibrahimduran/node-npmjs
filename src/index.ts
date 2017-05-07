@@ -191,6 +191,8 @@ export class Package {
 	}
 
 	public hasDependency(dep, dev = false): Promise<boolean> {
+		dep = Package.getPackageDir(dep);
+		
 		return new Promise<boolean>((resolve, reject) => {
 			fs.readJson(this._path + '/package.json')
 				.then((json: any) => resolve(
@@ -202,13 +204,24 @@ export class Package {
 	}
 
 	public getDependency(dep) {
-		const depPackage = new Package(path.join(this._path, 'node_modules', dep));
+		const depPackage = new Package(path.join(this._path, 'node_modules', Package.getPackageDir(dep)));
 		
 		return new Promise<Package>((resolve, reject) => {
 			fs.stat(depPackage._path)
 				.then(() => resolve(depPackage))
 				.catch(() => reject('Dependency does not exist!'));
 		});
+	}
+
+	public static getPackageDir(pkg: string) {
+		if (pkg.indexOf('.git') != -1) {
+			pkg = pkg.match(/(([a-z0-9.-]*).git)$/)[2];
+		} else {
+			pkg = pkg.replace('.tar.gz', '')
+				.replace(/(@[a-z0-9.-]*)$/, '');
+		}
+
+		return pkg;
 	}
 
 	public static create(dir): Promise<Package> {
