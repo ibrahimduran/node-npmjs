@@ -28,6 +28,10 @@ export class Package {
 	private static debug = require('debug')('puckages');
 	private _path: string;
 
+	get path() {
+		return this._path;
+	}
+
 	constructor(dir) {
 		this._path = path.normalize(dir);
 	}
