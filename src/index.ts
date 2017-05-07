@@ -160,6 +160,16 @@ export class Package {
 		});
 	}
 
+	public getDependency(dep) {
+		const depPackage = new Package(path.join(this._path, 'node_modules', dep));
+		
+		return new Promise<Package>((resolve, reject) => {
+			fs.stat(depPackage._path)
+				.then(() => resolve(depPackage))
+				.catch(() => reject('Dependency does not exist!'));
+		});
+	}
+
 	public static create(dir): Promise<Package> {
 		return new Promise<Package>((resolve, reject) => {
 			fs.mkdirp(dir, (err) => {
