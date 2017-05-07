@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { exec } from 'child_process';
+import { exec, ChildProcess } from 'child_process';
 
 export interface PackageConfig {
 	name?: string,
@@ -138,6 +138,10 @@ export class Package {
 					}
 				});
 		});
+	}
+
+	public run(opts: { script?: string, env?: any } = { script: null, env: { PATH: process.env.PATH } }): ChildProcess {
+		return exec(`npm run ${opts.script ? opts.script : 'start'}`, { cwd: this._path, env: opts.env });
 	}
 
 	public install(pkgs?: (string[] | string), save = false, dev = false) {
