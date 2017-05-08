@@ -123,25 +123,30 @@ export class Package {
 	}
 
 	public forceReloadJson(opts = { returnEmptyOnErr: false }) {
+		Package.debug('Force reloading json');
 		return new Promise<Package>((resolve, reject) => {
 			fs.readJson(path.join(this._path, 'package.json'))
 				.then(json => {
+					Package.debug('Successfully reloaded json data');
 					this._json = json;
 					resolve(this);
 				})
 				.catch(err => {
 					if (opts.returnEmptyOnErr) {
+						Package.debug('Json reload failed but returnEmptyOnErr enabled');
 						this._json = {};
 						resolve(this);
 					} else {
+						Package.debug('Json reload failed');
 						reject(err);
 					}
 				});
 		});
 	}
 
-	public run(opts: { script?: string, env?: any } = { script: null, env: { PATH: process.env.PATH } }): ChildProcess {
-		return exec(`npm run ${opts.script ? opts.script : 'start'}`, { cwd: this._path, env: opts.env });
+	public run(opts: { script?: string, env?: any } = { script: 'start', env: { PATH: process.env.PATH } }): ChildProcess {
+		Package.debug(`Running '${opts.script}' in ${this._path}`);
+		return exec(`npm run ${opts.script}`, { cwd: this._path, env: opts.env });
 	}
 
 	public install(pkgs?: (string[] | string), save = false, dev = false) {
@@ -174,6 +179,8 @@ export class Package {
 		return new Promise<Package>((resolve, reject) => {
 			if (!Array.isArray(pkgs)) pkgs = [pkgs];
 
+			Package.debug(`Uninstalling '${pkgs.join(', ')}' in ${this._path}`);
+
 			const cmd = `npm uninstall ${pkgs.join(' ')} ${save ? '--save' : ''}${dev ? '-dev' : ''}`;
 
 			exec(cmd, { cwd: this._path }, (err) => {
@@ -196,6 +203,8 @@ export class Package {
 
 	public hasDependency(dep, dev = false): Promise<boolean> {
 		dep = Package.getPackageDir(dep);
+
+		Package.debug(`Checking wether or not it has ${dep + (dev ? '(dev)' : '')} in ${this._path}`);
 		
 		return new Promise<boolean>((resolve, reject) => {
 			fs.readJson(this._path + '/package.json')
@@ -203,7 +212,11 @@ export class Package {
 					Boolean(!dev ? json.dependencies : json.devDependencies)
 					&& Boolean(!dev ? json.dependencies[dep] : json.devDependencies[dep])
 				))
-				.catch(err => reject(err));
+				.catch(err => {
+					Package.debug(`Dependency check failed in ${this._path}`);
+					Package.debug(err);
+					reject(err);
+				});
 		});
 	}
 
@@ -218,14 +231,18 @@ export class Package {
 	}
 
 	public static getPackageDir(pkg: string) {
-		if (pkg.indexOf('.git') != -1) {
-			pkg = pkg.match(/(([a-z0-9.-]*).git)$/)[2];
+		var name = pkg;
+
+		if (name.indexOf('.git') != -1) {
+			name = name.match(/(([a-z0-9.-]*).git)$/)[2];
 		} else {
-			pkg = pkg.replace('.tar.gz', '')
+			name = name.replace('.tar.gz', '')
 				.replace(/(@[a-z0-9.-]*)$/, '');
 		}
 
-		return pkg;
+		Package.debug(`Converted to package directory/name: ${pkg} => ${name}`);
+
+		return name;
 	}
 
 	public static create(dir): Promise<Package> {
