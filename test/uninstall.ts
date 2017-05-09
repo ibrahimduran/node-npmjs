@@ -11,7 +11,7 @@ describe('uninstall', function () {
 	beforeEach((done) => {
 		Package.create(pkgDir)
 			.then((p) => p.init({}, { fillEmpty: true }))
-			.then((p) => p.install('node-foo', true, true))
+			.then((p) => p.install('node-foo', { save: true, dev: true }))
 			.then((p) => {
 				pkg = p;
 				done();

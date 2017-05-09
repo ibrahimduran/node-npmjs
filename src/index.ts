@@ -24,6 +24,12 @@ export interface InitOptions {
 	overwrite?: boolean
 }
 
+export interface InstallOptions {
+	save?: boolean,
+	dev?: boolean,
+	symlink?: boolean
+}
+
 export class Package {
 	private static debug = require('debug')('puckages');
 	private _path: string;
@@ -107,8 +113,8 @@ export class Package {
 						if (opts.installDependencies) {
 							Package.debug('Installation of initialized dependencies is enabled');
 
-							this.install(config.dependencies, true, false)
-								.then(() => this.install(config.devDependencies, true, true))
+							this.install(config.dependencies, { save: true })
+								.then(() => this.install(config.devDependencies, { save: true, dev: true }))
 								.then(() => resolve(this));
 						} else {
 							resolve(this);
@@ -149,24 +155,35 @@ export class Package {
 		return exec(`npm run ${opts.script}`, { cwd: this._path, env: opts.env });
 	}
 
-	public install(pkgs?: (string[] | string), save = false, dev = false) {
+	public install(pkgs?: (string[] | string), opts:InstallOptions = { save: false, dev: false, symlink: false }) {
 		Package.debug('Installing dependencies for ' + this._path);
 
 		return new Promise<Package>((resolve, reject) => {
 			if (!Array.isArray(pkgs)) pkgs = [pkgs];
 
-			const cmd = `npm install ${pkgs.join(' ')} ${save ? '--save' : ''}${dev ? '-dev' : ''}`;
+			const cmd = `npm install ${pkgs.join(' ')} ${opts.save ? '--save' : ''}${opts.dev ? '-dev' : ''}`;
 
 			exec(cmd, { cwd: this._path }, (err) => {
 				if (!err) {
 					Package.debug('Installation successful for ' + this._path);
-					if (save) {
-						this.forceReloadJson()
-							.then(() => resolve(this))
-							.catch((err) => reject(err));
-					} else {
-						resolve(this);
+
+					var promises = [];
+
+					if (opts.symlink) {
+						promises.push(Promise.all((<string[]>pkgs).map(pkg => 
+							fs.symlink(
+								path.join(this._path, 'node_modules'),
+								path.join(this._path, 'node_modules', Package.getPackageDir(pkg), 'node_modules')))
+						))
 					}
+
+					if (opts.save) {
+						promises.push(this.forceReloadJson());
+					}
+
+					Promise.all(promises)
+						.then(() => resolve(this))
+						.catch((err) => reject(err));
 				} else {
 					Package.debug('Installation failed for ' + this._path);
 					reject(err);

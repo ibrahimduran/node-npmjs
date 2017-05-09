@@ -16,7 +16,7 @@ describe('run', function () {
 				name: 'foo',
 				scripts: { build: 'tsc index.ts', start: 'node index.js' },
 			}, { overwrite: true, fillEmpty: true }))
-			.then((p) => p.install('typescript', true))
+			.then((p) => p.install('typescript', { save: true }))
 			.then((p) => {
 				pkg = p;
 

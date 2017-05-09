@@ -29,7 +29,7 @@ describe('install', function () {
 	it('should install new packages', function (done) {
 		this.timeout(20000);
 
-		pkg.install('node-bar', true, true)
+		pkg.install('node-bar', { save: true, dev: true })
 			.then((p) => p.install('node-foo'))
 			.then((p) => fs.readJson(pkgDir + '/package.json'))
 			.then((json: any) => {
@@ -49,7 +49,7 @@ describe('install', function () {
 			});
 		};
 
-		pkg.install('node-bar', true)
+		pkg.install('node-bar', { save: true })
 			.then(() => done('it did not throw error'))
 			.catch((err) => err === 'some_fs_error' ? done() : done(err));
 	});
@@ -57,8 +57,16 @@ describe('install', function () {
 	it('should try to install not existing package', function (done) {
 		this.timeout(5000);
 
-		pkg.install(['not_existing_package', 'another_one'], true, true)
+		pkg.install(['not_existing_package', 'another_one'], { save: true, dev: true })
 			.then(() => done('Didn\'t throw any errors for not existing package.'))
 			.catch(() => done());
 	});
+
+	it('should create symlink in installed packages\' directory', function (done) {
+		pkg.install(['node-foo', 'node-bar'], { symlink: true })
+			.then(() => fs.readlink(`${pkgDir}/node_modules/node-foo/node_modules`))
+			.then(() => fs.readlink(`${pkgDir}/node_modules/node-bar/node_modules`))
+			.then(() => done())
+			.catch((err) => done(err));
+	})
 });

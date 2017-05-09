@@ -41,7 +41,7 @@ describe('hasDependency', function () {
 	it('should check for existing dependency', function (done) {
 		this.timeout(10000);
 
-		pkg.install('node-foo', true)
+		pkg.install('node-foo', { save: true })
 			.then(p => p.hasDependency('node-foo'))
 			.then((exists) => exists ? done() : done('it should have returned true'))
 			.catch(err => done(err));
@@ -50,7 +50,7 @@ describe('hasDependency', function () {
 	it('should check for existing dev dependency', function (done) {
 		this.timeout(10000);
 
-		pkg.install('node-foo', true, true)
+		pkg.install('node-foo', { save: true, dev: true })
 			.then(p => p.hasDependency('node-foo', true))
 			.then((exists) => exists ? done() : done('it should have returned true'))
 			.catch(err => done(err));
