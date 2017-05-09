@@ -8,16 +8,19 @@ describe('run', function () {
 	var pkgDir = __dirname + '/.test';
 	var pkg: Package;
 
-	before((done) => {
+	before(function (done) {
+		this.timeout(10000);
+		
 		Package.create(pkgDir)
 			.then((p) => p.init({
 				name: 'foo',
-				scripts: { start: 'node index.js', foo: 'node index.js' }
+				scripts: { build: 'tsc index.ts', start: 'node index.js' },
 			}, { overwrite: true, fillEmpty: true }))
+			.then((p) => p.install('typescript', true))
 			.then((p) => {
 				pkg = p;
 
-				fs.writeFile(pkgDir + '/index.js', 'console.log("Hello world!");')
+				fs.writeFile(pkgDir + '/index.ts', 'console.log("Hello world!");')
 					.then(() => done())
 					.catch((err) => done(err));
 			})
@@ -31,31 +34,34 @@ describe('run', function () {
 			setTimeout(done, 1000);
 		});
 	});
-
-	it('should run package (npm run start)', function (done) {
-		var childProcess = pkg.run();
-		var data = '';
-		childProcess.stderr.on('data', (err) => done(err));
-		childProcess.on('error', (err) => done(err));
-		childProcess.stdout.on('data', (chunk) => {
-			data += chunk;
+	
+	it('should run build script', function (done) {
+		this.timeout(7000);
+		
+		var cp = pkg.run({ script: 'build' });
+		cp.stderr.on('data', (err) => {
+			done(err);
 		});
-		childProcess.on('exit', () => {
-			assert.notEqual(String(data).indexOf('Hello world!\n'), -1);
+		cp.on('exit', () => {
 			done();
 		});
 	});
-
-	it('should run script', function (done) {
-		var childProcess = pkg.run({ script: 'foo' });
-		var data = '';
-		childProcess.stderr.on('data', (err) => done(err));
-		childProcess.on('error', (err) => done(err));
-		childProcess.stdout.on('data', (chunk) => {
-			data += chunk;
+	
+	it('should run start script', function (done) {
+		this.timeout(3000);
+		
+		var cp = pkg.run();
+		cp.stderr.on('data', (err) => {
+			done(err);
 		});
-		childProcess.on('exit', () => {
-			assert.notEqual(String(data).indexOf('Hello world!\n'), -1);
+		var output = '';
+		cp.stdout.on('data', (data) => {
+			output += data;
+		});
+		cp.stdout.on('end', () => {
+			assert.equal(String(output).indexOf('Hello world!\n') != -1, true);	
+		});
+		cp.on('exit', () => {
 			done();
 		});
 	});
