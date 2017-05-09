@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { exec, ChildProcess } from 'child_process';
+import { Writable } from 'stream';
 
 export interface PackageConfig {
 	name?: string,
@@ -34,6 +35,11 @@ export class Package {
 	private static debug = require('debug')('puckages');
 	private _path: string;
 	private _json: any = null;
+	private _pipe: {
+		stdout: Writable,
+		stderr: Writable,
+		persistent: boolean
+	} = { stdout: null, stderr: null, persistent: false };
 
 	get json() {
 		return this._json;
@@ -152,7 +158,10 @@ export class Package {
 
 	public run(opts: { script?: string, env?: any } = { script: 'start', env: { PATH: process.env.PATH } }): ChildProcess {
 		Package.debug(`Running '${opts.script}' in ${this._path}`);
-		return exec(`npm run ${opts.script}`, { cwd: this._path, env: opts.env });
+		const cp = exec(`npm run ${opts.script}`, { cwd: this._path, env: opts.env });
+		this._pipeChildProcess(cp);
+		
+		return cp;
 	}
 
 	public install(pkgs?: (string[] | string), opts:InstallOptions = { save: false, dev: false, symlink: false }) {
@@ -162,8 +171,7 @@ export class Package {
 			if (!Array.isArray(pkgs)) pkgs = [pkgs];
 
 			const cmd = `npm install ${pkgs.join(' ')} ${opts.save ? '--save' : ''}${opts.dev ? '-dev' : ''}`;
-
-			exec(cmd, { cwd: this._path }, (err) => {
+			const cp = exec(cmd, { cwd: this._path }, (err) => {
 				if (!err) {
 					Package.debug('Installation successful for ' + this._path);
 
@@ -189,7 +197,15 @@ export class Package {
 					reject(err);
 				}
 			});
+
+			this._pipeChildProcess(cp);
 		});
+	}
+
+	public pipe(stdout, stderr, persistent) {
+		this._pipe = { stdout, stderr, persistent };
+
+		return this;
 	}
 
 	public uninstall(pkgs: (string[] | string), save = false, dev = false) {
@@ -200,7 +216,7 @@ export class Package {
 
 			const cmd = `npm uninstall ${pkgs.join(' ')} ${save ? '--save' : ''}${dev ? '-dev' : ''}`;
 
-			exec(cmd, { cwd: this._path }, (err) => {
+			const cp = exec(cmd, { cwd: this._path }, (err) => {
 				if (!err) {
 					Package.debug('Uninstall successful for ' + this._path);
 					if (save) {
@@ -215,6 +231,8 @@ export class Package {
 					reject(err);
 				}
 			});
+
+			this._pipeChildProcess(cp);
 		});
 	}
 
@@ -235,6 +253,17 @@ export class Package {
 					reject(err);
 				});
 		});
+	}
+
+	private _pipeChildProcess(cp) {
+		if (this._pipe.stdout) cp.stdout.pipe(this._pipe.stdout, { end: false });
+		if (this._pipe.stderr) cp.stderr.pipe(this._pipe.stderr, { end: false });
+
+		cp.on('exit', () => {
+			if (!this._pipe.persistent) {
+				this._pipe = { stdout: null, stderr: null, persistent: false };
+			}
+		})
 	}
 
 	public getDependency(dep) {
