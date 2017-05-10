@@ -268,6 +268,10 @@ export class Package {
 
 	public getDependency(dep) {
 		const depPackage = new Package(path.join(this._path, 'node_modules', Package.getPackageDir(dep)));
+		depPackage._pipe = {
+			...this._pipe,
+			persistent: (this._pipe.stdout != null || this._pipe.stderr != null)
+		};
 		
 		return new Promise<Package>((resolve, reject) => {
 			fs.stat(depPackage._path)
