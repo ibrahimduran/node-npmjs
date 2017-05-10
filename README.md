@@ -20,10 +20,10 @@ Package.create('/path/to/package')
   .then(p => p.init())
 
   // Install a new package and save as dependency
-  .then(p => p.install('node-foo', true))
+  .then(p => p.install('node-foo', { save: true }))
   
   // Uninstall a package and update dependencies
-  .then(p => p.uninstall('node-foo', true))
+  .then(p => p.uninstall('node-foo', { save: true }))
 ```
 
 ## API
@@ -32,19 +32,15 @@ Until I properly write API/Doc, you can see definitions in [source](src/index.ts
 ## Verbose
 This package uses [debug](https://github.com/visionmedia/debug) module. So you can set environment variable to display verbose log messages.
 ```sh
-$ DEBUG=puckages:* node myApp.js
+$ DEBUG=puckages node myApp.js
 ```
 
-## Running Tests
+## Running Tests/Coverage
 ```bash
-$ npm test
+$ npm test # runs only test
+$ npm run coverage # runs test + coverage report
 ```
 
-For coverage report you must remap the coverage with tsc generated source maps.
-
-```bash
-$ npm run coverage && npm run remap-coverage
-```
 
 ## License
 MIT
