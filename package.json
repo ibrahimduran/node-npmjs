@@ -8,9 +8,8 @@
   "scripts": {
     "build": "tsc && typedoc --out doc .",
     "dev-env": "tsc --watch",
-    "test": "mocha",
-    "coverage": "nyc mocha",
-    "coveralls": "npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test": "nyc mocha",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "nyc": {
     "extension": [

@@ -37,8 +37,7 @@ $ DEBUG=puckages node myApp.js
 
 ## Running Tests/Coverage
 ```bash
-$ npm test # runs only test
-$ npm run coverage # runs test + coverage report
+$ npm test # runs both test + coverage on source code
 ```
 
 
