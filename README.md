@@ -27,7 +27,7 @@ Package.create('/path/to/package')
 ```
 
 ## API
-Until I properly write API/Doc, you can see definitions in [source](src/index.ts) file.
+You can find documentation [here](https://ibrahimduran.github.io/node-puckages/). All documentation has been generated from source code using the [typedoc](https://github.com/TypeStrong/typedoc).
 
 ## Verbose
 This package uses [debug](https://github.com/visionmedia/debug) module. So you can set environment variable to display verbose log messages.
