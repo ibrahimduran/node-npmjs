@@ -2,6 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { exec, ChildProcess } from 'child_process';
 import { Writable } from 'stream';
+import { EventEmitter } from 'events';
 
 /**
  * `custom` field is used to add custom properties to `package.json`.
@@ -95,10 +96,14 @@ export interface RunOptions {
  * This is the main class for managing npm packages on local file-system. You
  * can do most of the stuff you do in `npm` cli using this class.
  * 
+ * Events:
+ *   - *child_process*: Runs whenever a child process start, passes child process
+ * object to the callback function.
+ * 
  * @export
  * @class Package
  */
-export class Package {
+export class Package extends EventEmitter {
 	private static debug = require('debug')('puckages');
 	private _path: string;
 	private _json: any = null;
@@ -130,6 +135,8 @@ export class Package {
 	 * @param {string} dir
 	 */
 	constructor(dir: string) {
+		super();
+
 		this._path = path.normalize(dir);
 	}
 
@@ -396,6 +403,8 @@ export class Package {
 	 * @param {ChildProcess} cp 
 	 */
 	private _pipeChildProcess(cp: ChildProcess) {
+		this.emit('child_process', cp);
+		
 		if (this._pipe.stdout) cp.stdout.pipe(this._pipe.stdout, { end: false });
 		if (this._pipe.stderr) cp.stderr.pipe(this._pipe.stderr, { end: false });
 
